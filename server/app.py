@@ -48,7 +48,11 @@ setup_logging()
 @app.route('/')
 def dashboard():
     """Main dashboard showing all groups"""
-    return render_template('dashboard.html', groups=Config.GROUPS)
+    try:
+        return render_template('dashboard.html', groups=Config.GROUPS)
+    except Exception as e:
+        app.logger.error(f"Error rendering dashboard: {str(e)}")
+        return jsonify({'status': 'error', 'message': 'Internal server error'}), 500
 
 @app.route('/api/data', methods=['POST'])
 def receive_data():
@@ -71,7 +75,11 @@ def receive_data():
             return jsonify({'status': 'error', 'message': 'Invalid group_id'}), 400
 
         # Add timestamp and store data
-        data['timestamp'] = datetime.now().isoformat()
+        try:
+            data['timestamp'] = datetime.now().isoformat()
+        except Exception as e:
+            app.logger.error(f"Error creating timestamp: {str(e)}")
+            return jsonify({'status': 'error', 'message': 'Internal server error'}), 500
 
         with data_lock:
             group_data[group_id].append(data)
