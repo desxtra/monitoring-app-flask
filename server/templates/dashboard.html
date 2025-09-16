@@ -184,20 +184,20 @@
             {% endfor %}
         </div>
     </div>
-
     <script>
+        const groups = {{ groups|tojson }};
+    
         // Function to update group data
         function updateGroupData(groupId, data) {
             const container = document.getElementById(`data-${groupId}`);
             
-            if (data.length === 0) {
+            if (!data || data.length === 0) {
                 container.innerHTML = '<div class="no-data">No data received yet</div>';
                 return;
             }
             
             let html = '';
-            // Show only the latest 3 entries
-            const latestData = data.slice(-3);
+            const latestData = data.slice(-3); // only last 3 entries
             
             latestData.forEach(item => {
                 html += '<div class="data-item">';
@@ -212,54 +212,49 @@
             
             container.innerHTML = html;
         }
-        
+    
         // Function to update connected groups count
         function updateConnectedGroups() {
             let connectedCount = 0;
-            
-            {% for group_id in groups.keys() %}
-            const groupData = document.getElementById(`data-{{ group_id }}`);
-            if (groupData && !groupData.innerHTML.includes('No data received yet')) {
-                connectedCount++;
+            for (const groupId in groups) {
+                const groupData = document.getElementById(`data-${groupId}`);
+                if (groupData && !groupData.innerHTML.includes('No data received yet')) {
+                    connectedCount++;
+                }
             }
-            {% endfor %}
-            
             document.getElementById('connected-groups').textContent = 
-                `Connected groups: ${connectedCount}/{{ groups|length }}`;
+                `Connected groups: ${connectedCount}/${Object.keys(groups).length}`;
         }
-        
+    
         // Function to fetch data for all groups
         function fetchAllData() {
             let fetchedCount = 0;
-            const totalGroups = {{ groups|length }};
-            
-            {% for group_id in groups.keys() %}
-            fetch(`/api/data/{{ group_id }}`)
-                .then(response => response.json())
-                .then(data => {
-                    fetchedCount++;
-                    if (data.status === 'success') {
-                        updateGroupData('{{ group_id }}', data.data);
-                    }
-                    
-                    // Update status when all groups are fetched
-                    if (fetchedCount === totalGroups) {
-                        updateConnectedGroups();
-                        document.getElementById('last-update').textContent = 
-                            `Last update: ${new Date().toLocaleTimeString()}`;
-                    }
-                })
-                .catch(error => {
-                    fetchedCount++;
-                    console.error('Error fetching data for {{ group_id }}:', error);
-                    
-                    if (fetchedCount === totalGroups) {
-                        updateConnectedGroups();
-                    }
-                });
-            {% endfor %}
+            const totalGroups = Object.keys(groups).length;
+    
+            for (const groupId in groups) {
+                fetch(`/api/data/${groupId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        fetchedCount++;
+                        if (data.status === 'success') {
+                            updateGroupData(groupId, data.data);
+                        }
+                        if (fetchedCount === totalGroups) {
+                            updateConnectedGroups();
+                            document.getElementById('last-update').textContent = 
+                                `Last update: ${new Date().toLocaleTimeString()}`;
+                        }
+                    })
+                    .catch(error => {
+                        fetchedCount++;
+                        console.error(`Error fetching data for ${groupId}:`, error);
+                        if (fetchedCount === totalGroups) {
+                            updateConnectedGroups();
+                        }
+                    });
+            }
         }
-        
+    
         // Function to check server status
         function checkServerStatus() {
             fetch('/api/status')
@@ -267,7 +262,6 @@
                 .then(data => {
                     const indicator = document.getElementById('status-indicator');
                     const statusText = document.getElementById('server-status-text');
-                    
                     if (data.status === 'online') {
                         indicator.className = 'status-indicator status-online';
                         statusText.textContent = 'Server Online';
@@ -280,19 +274,18 @@
                     console.error('Error checking server status:', error);
                     const indicator = document.getElementById('status-indicator');
                     const statusText = document.getElementById('server-status-text');
-                    
                     indicator.className = 'status-indicator status-offline';
                     statusText.textContent = 'Server Offline';
                 });
         }
-        
+    
         // Initial data fetch
         fetchAllData();
         checkServerStatus();
-        
+    
         // Set up periodic updates
-        setInterval(fetchAllData, 3000); // Update every 3 seconds
-        setInterval(checkServerStatus, 10000); // Check server status every 10 seconds
-    </script>
+        setInterval(fetchAllData, 3000);
+        setInterval(checkServerStatus, 10000);
+    </script>    
 </body>
 </html>
