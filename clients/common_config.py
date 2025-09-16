@@ -26,13 +26,6 @@ DHT_PIN = 14
 # ULTRASONIC_TRIG_PIN = 13
 # ULTRASONIC_ECHO_PIN = 12
 
-# ===== SENSOR CONFIGURATION =====
-# Adjust these values based on your project needs
-MAX_DISTANCE = 50
-GESTURE_THRESHOLD = 10
-GESTURE_DURATION = 500
-GESTURE_COOLDOWN = 2000
-
 # ===== NETWORK CONFIGURATION =====
 RETRY_DELAY = 10  # seconds between connection retries
 SEND_INTERVAL = 5000  # milliseconds between data sends
