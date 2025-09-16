@@ -12,7 +12,7 @@ app = Flask(__name__)
 app.config.from_object(Config)
 
 # Initialize data storage
-group_data = {group: deque(maxlen=100) for group in Config.GROUPS}
+group_data = {group: deque(maxlen=1) for group in Config.GROUPS}
 data_lock = threading.Lock()
 
 # Setup logging
