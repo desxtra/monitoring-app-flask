@@ -1,31 +1,31 @@
-# Panduan Setup Sistem Monitoring IoT Kelas
+# IoT Monitoring System Setup Guide
 
-## Untuk Guru/Pengelola Server
+## For Server Administrator
 
-1. Pastikan Python 3.7+ terinstall di komputer server
-2. Copy folder `server` ke komputer yang akan menjadi server
-3. Buka terminal, masuk ke folder server, dan jalankan:
+1. Ensure Python 3.7+ is installed on the server machine
+2. Copy the `server` folder to the server machine
+3. Open a terminal, navigate to the server folder, and run:
 
 ```bash
     pip install -r requirements.txt
     python app.py
 ```
 
-4. Server akan berjalan di http://0.0.0.0:5000
-5. Catat alamat IP komputer server (gunakan `ipconfig` di Windows atau `ifconfig` di Linux/Mac)
+4. The server will run at http://0.0.0.0:5000
+5. Note the server's IP address (use `ipconfig` on Windows or `ifconfig` on Linux/Mac)
 
-## Untuk Setiap Kelompok
+## For Each Client
 
-1. Dapatkan alamat IP server dari guru
-2. Copy folder kelompok contoh (misal `group1_smartlight`) dan rename sesuai kelompok Anda
-3. Edit file `config.py` di folder kelompok Anda:
-- Ganti `GROUP_ID` dengan ID kelompok Anda (group1, group2, dst)
-- Ganti `SERVER_IP` dengan alamat IP server
-- Sesuaikan pin dan konfigurasi sensor sesuai hardware Anda
-4. Upload kode `main.py` dan `config.py` ke ESP32 menggunakan Thonny IDE
-5. Pastikan ESP32 terhubung ke WiFi yang sama dengan server
+1. Obtain the server's IP address from the administrator
+2. Copy the example client folder (e.g., `group1_smartlight`) and rename it according to your group
+3. Edit the `config.py` file in your group folder:
+- Change `GROUP_ID` to your group's ID (group1, group2, etc.)
+- Change `SERVER_IP` to the server's IP address
+- Adjust pin and sensor configurations according to your hardware
+4. Upload the `main.py` and `config.py` files to the ESP32 using Thonny IDE
+5. Ensure the ESP32 is connected to the same WiFi network as the server
 
-## Akses Dashboard
+## Accessing the Dashboard
 
-Buka browser dan kunjungi: http://[IP_SERVER]:5000
-Contoh: http://192.168.1.100:5000
+Open a web browser and visit: http://[SERVER_IP]:5000
+Example: http://192.168.1.100:5000
