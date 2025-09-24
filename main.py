@@ -7,18 +7,18 @@ from machine import Pin
 import urequests
 
 # Hardware Configuration
-PIR_PIN = 14        # PIR sensor pin
-RELAY_PIN = 2       # Relay pin for lamp control
+PIR_PIN = 34        # PIR sensor pin
+RELAY_PIN = 35       # Relay pin for lamp control
 
 # Network Configuration
-WIFI_SSID = "YOUR_WIFI_SSID"
-WIFI_PASSWORD = "YOUR_WIFI_PASSWORD"
-SERVER_IP = "192.168.1.100"  # Change to your server IP
+WIFI_SSID = "Roar Relaxing"
+WIFI_PASSWORD = "bebyschalke07"
+SERVER_IP = "192.168.1.6"
 SERVER_PORT = 5000
 
 # Initialize hardware
 pir = Pin(PIR_PIN, Pin.IN)
-relay = Pin(RELAY_PIN, Pin.OUT)
+relay = Pin(RELAY_PIN, Pin.IN)
 
 # Global variables
 lamp_state = False
