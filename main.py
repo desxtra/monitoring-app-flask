@@ -7,8 +7,8 @@ from machine import Pin
 import urequests
 
 # Hardware Configuration
-PIR_PIN = 34        # PIR sensor pin
-RELAY_PIN = 35       # Relay pin for lamp control
+PIR_PIN = 13        # PIR sensor pin
+RELAY_PIN = 4     # Relay pin for lamp control
 
 # Network Configuration
 WIFI_SSID = "Roar Relaxing"
@@ -18,7 +18,7 @@ SERVER_PORT = 5000
 
 # Initialize hardware
 pir = Pin(PIR_PIN, Pin.IN)
-relay = Pin(RELAY_PIN, Pin.IN)
+relay = Pin(RELAY_PIN, Pin.OUT)
 
 # Global variables
 lamp_state = False
