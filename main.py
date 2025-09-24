@@ -1,14 +1,13 @@
-# ESP32 Smart Lamp Client - MicroPython
+# SIMPLIFIED RELAY CONTROL - ESP32 MicroPython
 import network
-import socket
 import time
 import json
 from machine import Pin
 import urequests
 
 # Hardware Configuration
-PIR_PIN = 13        # PIR sensor pin
-RELAY_PIN = 4     # Relay pin for lamp control
+PIR_PIN = 13        
+RELAY_PIN = 2
 
 # Network Configuration
 WIFI_SSID = "Roar Relaxing"
@@ -18,11 +17,11 @@ SERVER_PORT = 5000
 
 # Initialize hardware
 pir = Pin(PIR_PIN, Pin.IN)
-relay = Pin(RELAY_PIN, Pin.OUT)
+relay = Pin(RELAY_PIN, Pin.OUT, value=1)  # Start HIGH (relay OFF)
 
 # Global variables
-lamp_state = False
-auto_mode = False
+lamp_state = True  # Start with lamp OFF
+auto_mode = False   # Start with auto mode OFF
 last_pir_state = False
 last_update = 0
 
@@ -47,8 +46,13 @@ def control_lamp(state):
     """Control the relay/lamp"""
     global lamp_state
     lamp_state = state
-    relay.value(1 if state else 0)  # Active high relay
-    print(f"Lamp {'ON' if state else 'OFF'}")
+    
+    if state:  # Lamp OFF
+        relay.value(1)  # Relay OFF
+        print("Lamp ON")
+    else:      # Lamp ON
+        relay.value(0)  # Relay ON
+        print("Lamp OFF")
 
 def send_status():
     """Send status to server"""
@@ -61,9 +65,7 @@ def send_status():
         }
         
         url = f"http://{SERVER_IP}:{SERVER_PORT}/api/status"
-        response = urequests.post(url, 
-                                json=data, 
-                                headers={'Content-Type': 'application/json'})
+        response = urequests.post(url, json=data, headers={'Content-Type': 'application/json'})
         response.close()
         
     except Exception as e:
@@ -89,7 +91,7 @@ def get_commands():
 
 def process_commands(commands):
     """Process commands from server"""
-    global auto_mode, lamp_state
+    global auto_mode
     
     if 'auto_mode' in commands:
         auto_mode = commands['auto_mode']
@@ -106,32 +108,32 @@ def auto_control():
     if auto_mode:
         current_pir = bool(pir.value())
         
-        # PIR state changed
         if current_pir != last_pir_state:
             last_pir_state = current_pir
             
             if current_pir:  # Motion detected
                 if not lamp_state:
-                    control_lamp(True)
+                    control_lamp(True)  # Turn lamp ON
                     print("Motion detected - Lamp ON")
             else:  # No motion
                 if lamp_state:
-                    control_lamp(False)
+                    control_lamp(False)  # Turn lamp OFF
                     print("No motion - Lamp OFF")
 
 def main():
     """Main program loop"""
     global last_update
     
-    print("Starting Smart Lamp Client...")
+    print("Starting Smart Lamp Client")
     
     # Connect to WiFi
     connect_wifi()
     
-    # Initialize lamp state
+    # Initialize lamp to OFF state
     control_lamp(False)
     
     print("Smart Lamp Client ready!")
+    print(f"Initial state - Lamp: {'ON' if lamp_state else 'OFF'}, Auto mode: {'ON' if auto_mode else 'OFF'}")
     
     while True:
         try:
@@ -140,8 +142,8 @@ def main():
             # Auto control based on PIR
             auto_control()
             
-            # Send status every 2 seconds
-            if current_time - last_update >= 2:
+            # Send status every 1 second
+            if current_time - last_update >= 1:
                 send_status()
                 
                 # Get and process commands
@@ -151,7 +153,7 @@ def main():
                 
                 last_update = current_time
             
-            time.sleep(0.1)  # Small delay to prevent excessive CPU usage
+            time.sleep(0.1)
             
         except KeyboardInterrupt:
             print("\nShutting down...")
