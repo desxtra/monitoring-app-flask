@@ -15,6 +15,9 @@ WIFI_PASSWORD = "bebyschalke07"
 SERVER_IP = "192.168.1.6"
 SERVER_PORT = 5000
 
+# Auto-off timeout configuration (seconds)
+NO_PRESENCE_TIMEOUT = 10  # Turn off lamp after some times
+
 # Initialize hardware
 pir = Pin(PIR_PIN, Pin.IN)
 relay = Pin(RELAY_PIN, Pin.OUT, value=1)  # Start HIGH (relay OFF)
@@ -24,6 +27,7 @@ lamp_state = True  # Start with lamp OFF
 auto_mode = False   # Start with auto mode OFF
 last_pir_state = False
 last_update = 0
+last_presence_time = 0  # Track when presence was last detected
 
 def connect_wifi():
     """Connect to WiFi network"""
@@ -47,12 +51,12 @@ def control_lamp(state):
     global lamp_state
     lamp_state = state
     
-    if state:  # Lamp OFF
+    if state:  # Lamp ON
         relay.value(1)  # Relay OFF
-        print("Lamp ON")
-    else:      # Lamp ON
-        relay.value(0)  # Relay ON
         print("Lamp OFF")
+    else:      # Lamp OFF
+        relay.value(0)  # Relay ON
+        print("Lamp ON")
 
 def send_status():
     """Send status to server"""
@@ -103,26 +107,29 @@ def process_commands(commands):
 
 def auto_control():
     """Automatic PIR-based lamp control"""
-    global last_pir_state
+    global last_pir_state, last_presence_time
     
     if auto_mode:
         current_pir = bool(pir.value())
+        current_time = time.time()
         
-        if current_pir != last_pir_state:
-            last_pir_state = current_pir
-            
-            if current_pir:  # Motion detected
-                if not lamp_state:
-                    control_lamp(True)  # Turn lamp ON
-                    print("Motion detected - Lamp ON")
-            else:  # No motion
-                if lamp_state:
-                    control_lamp(False)  # Turn lamp OFF
-                    print("No motion - Lamp OFF")
+        # If motion is detected, update presence time and turn lamp on
+        if current_pir:
+            last_presence_time = current_time
+            if not lamp_state:
+                control_lamp(True)  # Turn lamp ON
+                print("Motion detected - Lamp ON")
+        
+        # Check if timeout has elapsed since last presence
+        elif lamp_state and (current_time - last_presence_time >= NO_PRESENCE_TIMEOUT):
+            control_lamp(False)  # Turn lamp OFF
+            print(f"No presence for {NO_PRESENCE_TIMEOUT} seconds - Lamp OFF")
+        
+        last_pir_state = current_pir
 
 def main():
     """Main program loop"""
-    global last_update
+    global last_update, last_presence_time
     
     print("Starting Smart Lamp Client")
     
@@ -131,6 +138,9 @@ def main():
     
     # Initialize lamp to OFF state
     control_lamp(False)
+    
+    # Initialize presence time
+    last_presence_time = time.time()
     
     print("Smart Lamp Client ready!")
     print(f"Initial state - Lamp: {'ON' if lamp_state else 'OFF'}, Auto mode: {'ON' if auto_mode else 'OFF'}")
