@@ -10,9 +10,9 @@ PIR_PIN = 13
 RELAY_PIN = 2
 
 # Network Configuration
-WIFI_SSID = "Roar Relaxing"
-WIFI_PASSWORD = "bebyschalke07"
-SERVER_IP = "192.168.1.6"
+WIFI_SSID = "Khusus iot"
+WIFI_PASSWORD = "123456789"
+SERVER_IP = "192.168.1.117"
 SERVER_PORT = 5000
 
 # Auto-off timeout configuration (seconds)

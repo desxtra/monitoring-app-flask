@@ -210,3 +210,6 @@ __marimo__/
 .venv
 .venv/
 .venv/*
+
+backup.py
+smart_lamp.db
