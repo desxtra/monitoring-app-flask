@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ESP32 Class Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏫 ESP32 Class Dashboard</h1>
+            <p>Real-time data from all groups</p>
+            <div id="last-updated">Last updated: <span id="update-time">-</span></div>
+        </header>
+
+        <div id="groups-container" class="groups-grid">
+            <!-- Groups will be dynamically inserted here -->
+        </div>
+
+        <footer>
+            <p>Total groups: <span id="total-groups">0</span> | Update every 5 seconds</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
