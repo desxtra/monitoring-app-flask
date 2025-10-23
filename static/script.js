@@ -55,8 +55,25 @@ function displayGroups(groupsData) {
 
 // Check if data is recent (within last 2 minutes)
 function isRecent(timestamp) {
-    const now = Date.now() / 1000;
-    return (now - timestamp) < 120; // 2 minutes
+    // Get the latest timestamp from all groups as reference
+    const latestTs = window.latestTimestamp || timestamp;
+    // Update our reference timestamp if this one is more recent
+    if (timestamp > window.latestTimestamp || !window.latestTimestamp) {
+        window.latestTimestamp = timestamp;
+    }
+    
+    // Compare with the latest known timestamp instead of system time
+    const difference = Math.abs(latestTs - timestamp);
+    
+    // Debug info
+    console.log('Timestamp check:', {
+        timestamp,
+        latestKnown: latestTs,
+        difference,
+        isRecent: difference < 120
+    });
+    
+    return difference < 120; // Within 2 minutes of the latest reading
 }
 
 // Format sensor values for display

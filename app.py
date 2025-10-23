@@ -31,7 +31,11 @@ def receive_esp32_data():
             return jsonify({"error": "Missing required fields"}), 400
         
         group_id = data['group_id']
-        timestamp = data.get('timestamp', datetime.now().timestamp())
+        # Get and convert timestamp
+        raw_timestamp = data.get('timestamp', datetime.now().timestamp())
+        print(f"Received timestamp ({type(raw_timestamp)}): {raw_timestamp}")
+        timestamp = float(raw_timestamp)
+        print(f"Converted timestamp: {timestamp}")
         sensor_data = data['sensor_data']
         
         # Validate group ID

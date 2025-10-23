@@ -36,6 +36,7 @@ def save_sensor_data(group_id, timestamp, sensor_data):
     """Save sensor data from ESP32 to database"""
     conn = get_db_connection()
     
+    print(f"Saving to DB - Group: {group_id}, Timestamp ({type(timestamp)}): {timestamp}")
     # Convert sensor_data dict to JSON string
     sensor_json = json.dumps(sensor_data)
     
@@ -71,9 +72,11 @@ def get_latest_data_all_groups():
     # Convert to list of dictionaries
     result = []
     for row in rows:
+        ts = row['timestamp']
+        print(f"Retrieved from DB - Group: {row['group_id']}, Timestamp ({type(ts)}): {ts}")
         result.append({
             'group_id': row['group_id'],
-            'timestamp': row['timestamp'],
+            'timestamp': ts,
             'sensor_data': json.loads(row['sensor_data']),
             'received_at': row['received_at']
         })
